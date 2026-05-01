@@ -28,7 +28,7 @@ Permitir la eliminación (baja) de un casillero (Locker) del sistema, posibilita
 ### Modelo de Datos
 No se requieren cambios estructurales en Prisma ni en la entidad. Se trabajará sobre la entidad `Locker` existente.
 *   Se utilizará el campo `id` de tipo `uuid` (Primary Key) para ubicar el registro.
-*   Se validará el campo `status` previo a la ejecución del borrado.
+*   Se validará el campo `status` y el campo `member_id` previo a la ejecución del borrado.
 
 ### Contrato de API (@alentapp/shared)
 *   **Endpoint**: `DELETE /api/v1/lockers/:id`
