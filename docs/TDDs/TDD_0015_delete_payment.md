@@ -49,7 +49,7 @@ A nivel de API REST, la operación de eliminar un recurso se modela con el verbo
 
 | Escenario                  | Resultado Esperado                            | Código HTTP actual        |
 | -------------------------- | --------------------------------------------- | ------------------------- |
-| Pago inexistente           | Mensaje: "El pago no existe"                  | 400 Bad Request           |
+| Pago inexistente           | Mensaje: "El pago no existe"                  | 404 Not Found             |
 | Pago ya abonado (`Paid`)   | Mensaje: "No se puede anular un pago cobrado" | 409 Conflict              |
 | Error de conexión a DB     | Mensaje: error del motor de base de datos     | 500 Internal Server Error |
 | Anulación exitosa          | Respuesta vacía                               | 204 No Content            |

@@ -55,7 +55,7 @@ Se utilizará el paquete compartido para definir el cuerpo de la petición. Todo
 
 | Escenario                  | Resultado Esperado                            | Código HTTP actual        |
 | -------------------------- | --------------------------------------------- | ------------------------- |
-| Pago inexistente           | Mensaje: "El pago no existe"                  | 400 Bad Request           |
+| Pago inexistente           | Mensaje: "El pago no existe"                  | 404 Not Found             |
 | Pago ya cerrado/cobrado    | Mensaje: "No se puede editar un pago cerrado" | 409 Conflict              |
 | Monto negativo             | Mensaje: "El monto debe ser mayor a cero"     | 400 Bad Request           |
 | Cambio de estado a Paid    | Autocompleta `payment_date` silenciosamente   | 200 OK                    |

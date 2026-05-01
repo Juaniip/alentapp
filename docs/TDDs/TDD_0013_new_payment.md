@@ -69,8 +69,16 @@ Definiremos los tipos en el paquete compartido para asegurar sincronización:
 
 | Escenario                  | Resultado Esperado                            | Código HTTP actual        |
 | -------------------------- | --------------------------------------------- | ------------------------- |
-| Socio inexistente          | Mensaje: "El socio especificado no existe"    | 400 Bad Request           |
+| Socio inexistente          | Mensaje: "El socio especificado no existe"    | 404 Not Found             |
 | Monto negativo o cero      | Mensaje: "El monto debe ser mayor a 0"        | 400 Bad Request           |
 | Falta de campos requeridos | Mensaje: "Faltan campos obligatorios"         | 400 Bad Request           |
 | Error de conexión a DB     | Mensaje: "Error interno, reintente más tarde" | 500 Internal Server Error |
 | Creación exitosa           | Retorna la entidad con status "Pending"       | 201 Created               |
+
+## Plan de Implementación
+
+1. Definir esquema de persistencia en Prisma reflejando las columnas y la FK hacia Member, y correr migración.
+2. Crear tipos (`CreatePaymentRequest`) en el paquete `@alentapp/shared` y el puerto en el Dominio.
+3. Implementar el repositorio y el caso de uso `CreatePaymentUseCase`.
+4. Crear la ruta POST en el controlador y conectar con la aplicación.
+5. Crear el formulario de carga en el frontend (React) permitiendo seleccionar el socio y enviar el request al backend.
