@@ -33,6 +33,7 @@ Permitir a los administrativos actualizar los datos de un préstamo existente, p
 
 Se utilizará una actualización parcial. Solo se permiten los campos modificables.
 
+- **Endpoint**: `PUT /api/v1/equipment-loans/:id` → `200 OK`
 - **Request Body**:
 
 ```ts

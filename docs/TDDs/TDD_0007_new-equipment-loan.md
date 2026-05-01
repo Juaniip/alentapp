@@ -61,6 +61,7 @@ enum LoanStatus {
 
 ### Contrato de API (`@alentapp/shared`)
 
+- **Endpoint**: `POST /api/v1/equipment-loans` → `201 Created`
 - **Request Body**:
 
 ```ts
