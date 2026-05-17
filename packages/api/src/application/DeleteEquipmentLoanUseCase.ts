@@ -6,13 +6,16 @@ export class DeleteEquipmentLoanUseCase {
     ) {}
 
     async execute(id: string): Promise<void> {
-        // 1. Verificar que el préstamo existe antes de intentar borrarlo
-        const existingLoan = await this.equipmentLoanRepository.findById(id);
-        if (!existingLoan) {
+        const loan = await this.equipmentLoanRepository.findById(id);
+        if (!loan) {
             throw new Error('El préstamo no existe.');
         }
 
-        // 2. Borrado físico (hard delete)
+        // VALIDACIÓN: solo se pueden borrar préstamos en estado Loaned
+        if (loan.status !== 'Loaned') {
+            throw new Error('Solo se pueden eliminar préstamos en estado Loaned.');
+        }
+
         await this.equipmentLoanRepository.delete(id);
     }
 }
