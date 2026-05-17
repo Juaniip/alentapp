@@ -1,4 +1,5 @@
 import { IEquipmentLoanRepository } from '../domain/EquipmentLoanRepository.js';
+import { InvalidLoanStatusError } from '../domain/errors/InvalidLoanStatusError.js';
 
 export class DeleteEquipmentLoanUseCase {
     constructor(
@@ -11,9 +12,10 @@ export class DeleteEquipmentLoanUseCase {
             throw new Error('El préstamo no existe.');
         }
 
-        // VALIDACIÓN: solo se pueden borrar préstamos en estado Loaned
+        // Solo los préstamos en estado Loaned pueden eliminarse
+        // para preservar la auditoría de devoluciones y daños.
         if (loan.status !== 'Loaned') {
-            throw new Error('Solo se pueden eliminar préstamos en estado Loaned.');
+            throw new InvalidLoanStatusError('Solo se pueden eliminar préstamos en estado Loaned.');
         }
 
         await this.equipmentLoanRepository.delete(id);
