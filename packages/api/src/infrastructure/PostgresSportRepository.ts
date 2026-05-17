@@ -71,6 +71,13 @@ export class PostgresSportRepository implements SportRepository {
         });
     }
 
+    async findAll(): Promise<SportDTO[]> {
+        const sports = await prisma.sport.findMany({
+            orderBy: { name: 'asc' },
+        });
+        return sports.map(sport => this.mapToDTO(sport));
+    }
+
     async hasActiveEnrollments(sportId: string): Promise<boolean> {
         // TODO: Implement when Enrollment model is created
         // For now, returns false as placeholder
