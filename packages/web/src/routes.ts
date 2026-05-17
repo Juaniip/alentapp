@@ -1,9 +1,10 @@
 import { createBrowserRouter } from "react-router";
 import { MembersView } from "./views/Members";
 import { HomeView } from "./views/Home";
-import { LockersView } from "./views/Lockers";  // <-- nuevo
+import { LockersView } from "./views/Lockers";
+import { SportsView } from "./views/Sports";
 import Layout from "./Layout";
-import { PaymentsView } from './views/Payments'; // Actualizado al nombre correcto del componente
+import { PaymentsView } from './views/Payments';
 
 export let router = createBrowserRouter([
   {
@@ -21,9 +22,14 @@ export let router = createBrowserRouter([
         path: "/payments",
         Component: PaymentsView,
       },
-      { path: "/", Component: HomeView },
-      { path: "/members", Component: MembersView },
-      { path: "/lockers", Component: LockersView },  // <-- nuevo
+      {
+        path: "/lockers",
+        Component: LockersView,
+      },
+      {
+        path: "/sports",
+        Component: SportsView,
+      },
     ],
   },
 ]);
