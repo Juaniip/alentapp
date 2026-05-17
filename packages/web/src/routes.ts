@@ -1,10 +1,11 @@
 import { createBrowserRouter } from "react-router";
 import { MembersView } from "./views/Members";
 import { HomeView } from "./views/Home";
-import { LockersView } from "./views/Lockers";  // <-- nuevo
+import { LockersView } from "./views/Lockers";
+import { SportsView } from "./views/Sports";
 import Layout from "./Layout";
-import { PaymentsView } from './views/Payments'; // Actualizado al nombre correcto del componente
-import { EquipmentLoansView } from './views/EquipmentLoans'; // Asegúrate de importar el componente correcto para la ruta de préstamos de equipamiento
+import { PaymentsView } from './views/Payments';
+import { EquipmentLoansView } from './views/EquipmentLoans'; 
 
 export let router = createBrowserRouter([
   {
@@ -22,10 +23,18 @@ export let router = createBrowserRouter([
         path: "/payments",
         Component: PaymentsView,
       },
-      { path: "/", Component: HomeView },
-      { path: "/members", Component: MembersView },
-      { path: "/lockers", Component: LockersView },  
-      { path: '/equipment-loans', Component: EquipmentLoansView },
+      {
+        path: "/lockers",
+        Component: LockersView,
+      },
+      {
+        path: "/sports",
+        Component: SportsView,
+      }, 
+      { 
+        path: '/equipment-loans', 
+        Component: EquipmentLoansView 
+      },
     ],
   },
 ]);
