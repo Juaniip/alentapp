@@ -4,6 +4,8 @@ import { UpdateEquipmentLoanUseCase } from '../application/UpdateEquipmentLoanUs
 import { DeleteEquipmentLoanUseCase } from '../application/DeleteEquipmentLoanUseCase.js';
 import { GetEquipmentLoansUseCase } from '../application/GetEquipmentLoansUseCase.js';
 import { CreateEquipmentLoanRequest, UpdateEquipmentLoanRequest } from '@alentapp/shared';
+import { InvalidLoanStatusError } from '../domain/errors/InvalidLoanStatusError.js';
+
 
 export class EquipmentLoanController {
     constructor(
@@ -81,6 +83,9 @@ export class EquipmentLoanController {
         } catch (error: any) {
             if (error.message.includes('no existe')) {
                 return reply.status(404).send({ error: error.message });
+            }
+            if (error instanceof InvalidLoanStatusError) {
+                return reply.status(403).send({ error: error.message });
             }
             return reply.status(500).send({ error: 'Error interno, reintente más tarde.' });
         }

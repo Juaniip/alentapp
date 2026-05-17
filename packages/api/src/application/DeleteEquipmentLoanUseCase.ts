@@ -1,4 +1,5 @@
 import { IEquipmentLoanRepository } from '../domain/EquipmentLoanRepository.js';
+import { InvalidLoanStatusError } from '../domain/errors/InvalidLoanStatusError.js';
 
 export class DeleteEquipmentLoanUseCase {
     constructor(
@@ -6,13 +7,17 @@ export class DeleteEquipmentLoanUseCase {
     ) {}
 
     async execute(id: string): Promise<void> {
-        // 1. Verificar que el préstamo existe antes de intentar borrarlo
-        const existingLoan = await this.equipmentLoanRepository.findById(id);
-        if (!existingLoan) {
+        const loan = await this.equipmentLoanRepository.findById(id);
+        if (!loan) {
             throw new Error('El préstamo no existe.');
         }
 
-        // 2. Borrado físico (hard delete)
+        // Solo los préstamos en estado Loaned pueden eliminarse
+        // para preservar la auditoría de devoluciones y daños.
+        if (loan.status !== 'Loaned') {
+            throw new InvalidLoanStatusError('Solo se pueden eliminar préstamos en estado Loaned.');
+        }
+
         await this.equipmentLoanRepository.delete(id);
     }
 }
