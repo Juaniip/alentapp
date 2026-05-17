@@ -1,6 +1,6 @@
 ---
 id: 0015
-estado: Propuesto
+estado: Implementado
 autor: Álvaro Marini
 fecha: 2026-05-01
 titulo: Eliminación (Baja Lógica) de Pagos Existentes

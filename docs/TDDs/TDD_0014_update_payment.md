@@ -1,6 +1,6 @@
 ---
 id: 0014
-estado: Propuesto
+estado: Implementado
 autor: Álvaro Marini
 fecha: 2026-05-01
 titulo: Actualización de Pagos Existentes

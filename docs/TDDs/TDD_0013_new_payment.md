@@ -1,6 +1,6 @@
 ---
 id: 0013
-estado: Propuesto
+estado: Implementado
 autor: Álvaro Marini
 fecha: 2026-05-01
 titulo: Registro de Nuevos Pagos
