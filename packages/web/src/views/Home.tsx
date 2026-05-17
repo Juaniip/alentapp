@@ -1,4 +1,4 @@
-import { LuUsers, LuWarehouse, LuCreditCard } from "react-icons/lu";
+import { LuUsers, LuWarehouse, LuCreditCard, LuPackage } from "react-icons/lu";
 import { Box, SimpleGrid, Heading, Text, VStack } from "@chakra-ui/react";
 import { SectionCard } from "../components/SectionCard";
 
@@ -44,6 +44,14 @@ export function HomeView() {
           to="/lockers"
           icon={LuWarehouse}
         />
+
+        <SectionCard 
+          title="Préstamos de Equipamiento"
+          description="Registrá y gestioná el equipamiento deportivo prestado a los socios."
+          to="/equipment-loans"
+          icon={LuPackage}
+        />
+
         {/* Future sections can be added here following the same pattern */}
         <Box 
           p="6" 

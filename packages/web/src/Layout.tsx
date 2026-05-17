@@ -57,6 +57,19 @@ function Layout() {
                                 Casilleros
                             </Text>
                         </RouterLink>
+                        <RouterLink to="/equipment-loans">
+                            <Text
+                                fontWeight="semibold"
+                                fontSize="sm"
+                                textTransform="uppercase"
+                                letterSpacing="wider"
+                                color="fg.muted"
+                                _hover={{ color: "blue.500", textDecoration: "none" }}
+                            >
+                                Préstamos
+                            </Text>
+                        </RouterLink>
+
                     </HStack>
                 </Flex>
             </Box>
