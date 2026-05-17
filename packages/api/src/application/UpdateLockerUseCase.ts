@@ -11,12 +11,17 @@ export class UpdateLockerUseCase {
             throw new Error(`El casillero con id ${id} no existe`);
         }
 
-        // Regla de negocio: no se puede asignar un socio si el status es Maintenance
         const resultingStatus = data.status ?? locker.status;
         const resultingMemberId = data.member_id !== undefined ? data.member_id : locker.member_id;
 
+        // Regla de negocio: no se puede asignar un socio si el status es Maintenance
         if (resultingStatus === 'Maintenance' && resultingMemberId !== null) {
             throw new Error(`Un casillero en mantenimiento no puede tener un socio asignado`);
+        }
+
+        // Regla de negocio: no puede estar Occupied sin socio asignado
+        if (resultingStatus === 'Occupied' && resultingMemberId === null) {
+            throw new Error(`Un casillero no puede estar Occupied sin un socio asignado`);
         }
 
         // Validar unicidad del número si se está modificando
@@ -39,6 +44,16 @@ export class UpdateLockerUseCase {
             if (existingLocker) {
                 throw new Error(`El socio ya tiene un casillero asignado (N° ${existingLocker.number})`);
             }
+        }
+
+        // Regla de negocio: si se asigna un socio y el status es Available, se pone Occupied automáticamente
+        if (resultingMemberId !== null && resultingStatus === 'Available') {
+            data.status = 'Occupied';
+        }
+
+        // Regla de negocio: si se desasigna el socio y el status es Occupied, se pone Available automáticamente
+        if (resultingMemberId === null && resultingStatus === 'Occupied') {
+            data.status = 'Available';
         }
 
         return await this.lockerRepository.update(id, data);
