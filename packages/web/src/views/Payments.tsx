@@ -16,9 +16,9 @@ import {
 
 const statusCategories = createListCollection({
   items: [
-    { label: "Pendiente", value: "Pending" },
-    { label: "Pagado", value: "Paid" },
-    { label: "Cancelado", value: "Canceled" },
+    { label: "Pending", value: "Pending" },
+    { label: "Paid", value: "Paid" },
+    { label: "Canceled", value: "Canceled" },
   ],
 });
 
@@ -295,7 +295,7 @@ export function PaymentsView() {
                         bg={payment.status === 'Paid' ? 'green.50' : payment.status === 'Pending' ? 'orange.50' : 'red.50'} 
                         color={payment.status === 'Paid' ? 'green.700' : payment.status === 'Pending' ? 'orange.700' : 'red.700'} 
                       >
-                        {payment.status === 'Paid' ? 'Pagado' : payment.status === 'Pending' ? 'Pendiente' : 'Cancelado'}
+                        {payment.status === 'Paid' ? 'Paid' : payment.status === 'Pending' ? 'Pending' : 'Canceled'}
                       </Box>
                     </Table.Cell>
                     <Table.Cell textAlign="end">
