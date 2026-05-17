@@ -82,6 +82,9 @@ export class EquipmentLoanController {
             if (error.message.includes('no existe')) {
                 return reply.status(404).send({ error: error.message });
             }
+            if (error.message.includes('estado Loaned')) {
+                return reply.status(403).send({ error: error.message });
+            }
             return reply.status(500).send({ error: 'Error interno, reintente más tarde.' });
         }
     }
