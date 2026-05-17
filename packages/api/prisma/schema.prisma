@@ -34,6 +34,7 @@ model Member {
     status     MemberStatus   @default(Activo)
     created_at DateTime       @default(now())
     payments   Payment[]
+    equipmentLoans EquipmentLoan[]
 
     @@map("members") // Para que en la DB la tabla se llame 'members' en minúscula
 }
@@ -84,4 +85,23 @@ model Sport {
         requires_medical_certificate Boolean
 
         @@map("sports")
+}
+
+enum LoanStatus {
+    Loaned
+    Returned
+    Damaged
+}
+
+model EquipmentLoan {
+    id       String     @id @default(uuid())
+    itemName String
+    status   LoanStatus @default(Loaned)
+    loanDate DateTime   @default(now())
+    dueDate  DateTime
+    memberId String
+
+    member   Member     @relation(fields: [memberId], references: [id])
+
+    @@map("equipment_loans")
 }

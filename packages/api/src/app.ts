@@ -29,9 +29,19 @@ import { PostgresSportRepository } from './infrastructure/PostgresSportRepositor
 import { CreateSportUseCase } from './application/CreateSportUseCase.js';
 import { UpdateSportUseCase } from './application/UpdateSportUseCase.js';
 import { DeleteSportUseCase } from './application/DeleteSportUseCase.js';
+import { GetSportsUseCase } from './application/GetSportsUseCase.js';
 import { SportValidator } from './domain/services/SportValidator.js';
 import { DeleteSportValidator } from './domain/services/DeleteSportValidator.js';
 import { SportController } from './delivery/SportController.js';
+
+// EquipmentLoan
+import { PrismaEquipmentLoanRepository } from './infrastructure/PrismaEquipmentLoanRepository.js';
+import { CreateEquipmentLoanUseCase } from './application/CreateEquipmentLoanUseCase.js';
+import { UpdateEquipmentLoanUseCase } from './application/UpdateEquipmentLoanUseCase.js';
+import { DeleteEquipmentLoanUseCase } from './application/DeleteEquipmentLoanUseCase.js';
+import { EquipmentLoanController } from './delivery/EquipmentLoanController.js';
+import { GetEquipmentLoansUseCase } from './application/GetEquipmentLoansUseCase.js';
+
 
 export function buildApp() {
     const server = Fastify({
@@ -122,11 +132,32 @@ export function buildApp() {
     const createSportUseCase = new CreateSportUseCase(sportRepo);
     const updateSportUseCase = new UpdateSportUseCase(sportRepo, sportValidator);
     const deleteSportUseCase = new DeleteSportUseCase(sportRepo, deleteSportValidator);
-    const sportController = new SportController(createSportUseCase, updateSportUseCase, deleteSportUseCase);
+    const getSportsUseCase = new GetSportsUseCase(sportRepo);
+    const sportController = new SportController(createSportUseCase, updateSportUseCase, deleteSportUseCase, getSportsUseCase);
 
+    server.get('/api/v1/deportes', sportController.getAll.bind(sportController));
     server.post('/api/v1/deportes', sportController.create.bind(sportController));
     server.put('/api/v1/deportes/:id', sportController.update.bind(sportController));
     server.delete('/api/v1/deportes/:id', sportController.delete.bind(sportController));
+    
+    
+    // --- EquipmentLoan ---
+    const equipmentLoanRepo = new PrismaEquipmentLoanRepository();
+    const createEquipmentLoanUseCase = new CreateEquipmentLoanUseCase(equipmentLoanRepo, memberRepo);
+    const updateEquipmentLoanUseCase = new UpdateEquipmentLoanUseCase(equipmentLoanRepo);
+    const deleteEquipmentLoanUseCase = new DeleteEquipmentLoanUseCase(equipmentLoanRepo);
+    const getEquipmentLoansUseCase = new GetEquipmentLoansUseCase(equipmentLoanRepo);
+    const equipmentLoanController = new EquipmentLoanController(
+        createEquipmentLoanUseCase,
+        updateEquipmentLoanUseCase,
+        deleteEquipmentLoanUseCase,
+        getEquipmentLoansUseCase, 
+    );
+
+    server.get('/api/v1/equipment-loans', equipmentLoanController.getAll.bind(equipmentLoanController));
+    server.post('/api/v1/equipment-loans', equipmentLoanController.create.bind(equipmentLoanController));
+    server.put('/api/v1/equipment-loans/:id', equipmentLoanController.update.bind(equipmentLoanController));
+    server.delete('/api/v1/equipment-loans/:id', equipmentLoanController.delete.bind(equipmentLoanController));
     
     server.get('/', async (req, rep) => {
         rep.status(200).send({ msg: 'asd' });

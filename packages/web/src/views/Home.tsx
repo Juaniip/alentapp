@@ -1,4 +1,4 @@
-import { LuUsers, LuWarehouse, LuCreditCard, LuTrophy } from "react-icons/lu";
+import { LuUsers, LuWarehouse, LuCreditCard, LuTrophy, LuPackage } from "react-icons/lu";
 import { Box, SimpleGrid, Heading, Text, VStack } from "@chakra-ui/react";
 import { SectionCard } from "../components/SectionCard";
 
@@ -30,14 +30,16 @@ export function HomeView() {
           to="/members"
           icon={LuUsers}
         />
-
+          
+        {/* Tarjeta de Pagos */}
         <SectionCard
           title="Pagos y Cuotas"
           description="Registra los pagos de los socios, controla los vencimientos y el estado de las cuotas."
           to="/payments"
           icon={LuCreditCard}
         />
-
+          
+        {/* Tarjeta de Casilleros */}
         <SectionCard
           title="Casilleros"
           description="Gestioná el inventario de casilleros del club, su estado y asignación a socios."
@@ -45,18 +47,28 @@ export function HomeView() {
           icon={LuWarehouse}
         />
 
+        {/* Tarjeta de Deportes */}
         <SectionCard
           title="Deportes"
           description="Administra los deportes disponibles en el club, cupos y requisitos médicos."
           to="/sports"
           icon={LuTrophy}
         />
+        
+        {/* Tarjeta de Préstamos de Equipamiento */}
+        <SectionCard 
+          title="Préstamos de Equipamiento"
+          description="Registrá y gestioná el equipamiento deportivo prestado a los socios."
+          to="/equipment-loans"
+          icon={LuPackage}
+        />
 
-        <Box
-          p="6"
-          bg="bg.muted/30"
-          borderRadius="2xl"
-          borderWidth="1px"
+        {/* Future sections can be added here following the same pattern */}
+        <Box 
+          p="6" 
+          bg="bg.muted/30" 
+          borderRadius="2xl" 
+          borderWidth="1px" 
           borderColor="border.subtle"
           borderStyle="dashed"
           display="flex"
