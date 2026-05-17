@@ -12,17 +12,17 @@ titulo: Registro de Préstamo de Equipamiento
 
 ### Objetivo
 
-Permitir a los administrativos registrar el préstamo de equipamiento deportivo a un socio, garantizando que solo los socios habilitados (categoría **Senior** o **Lifetime**) puedan solicitar material, sin necesidad de que el administrativo deba verificarlo manualmente.
+Permitir a los administrativos registrar el préstamo de equipamiento deportivo a un socio, garantizando que solo los socios habilitados (categoría **Pleno** o **Honorario**) puedan solicitar material, sin necesidad de que el administrativo deba verificarlo manualmente.
 
 ### User Persona
 
 - Nombre: Alberto (Tesorero/Administrativo).
-- Necesidad: Registrar rápidamente qué material se le presta a qué socio y hasta cuándo debe devolverlo. Si intenta prestarle algo a un socio Cadet, el sistema debe impedírselo automáticamente con un mensaje claro.
+- Necesidad: Registrar rápidamente qué material se le presta a qué socio y hasta cuándo debe devolverlo. Si intenta prestarle algo a un socio Cadete, el sistema debe impedírselo automáticamente con un mensaje claro.
 
 ### Criterios de Aceptación
 
-- El sistema debe rechazar la creación si el socio tiene categoría `Cadet`, retornando un error descriptivo.
-- El sistema debe permitir crear el préstamo únicamente para socios con categoría `Senior` o `Lifetime`.
+- El sistema debe rechazar la creación si el socio tiene categoría `Cadete`, retornando un error descriptivo.
+- El sistema debe permitir crear el préstamo únicamente para socios con categoría `Pleno` o `Honorario`.
 - El campo `status` debe ser asignado automáticamente como `Loaned` por el servidor; el cliente no puede definirlo.
 - El campo `loan_date` debe ser asignado automáticamente con la fecha y hora actuales del servidor.
 - La `due_date` debe ser estrictamente posterior al momento de creación.
@@ -68,7 +68,7 @@ enum LoanStatus {
 {
   itemName: string;  // Requerido. No puede estar vacío.
   dueDate: string;   // ISO 8601. Debe ser posterior a NOW().
-  memberId: string;  // UUID del socio. Debe existir y ser Senior o Lifetime.
+  memberId: string;  // UUID del socio. Debe existir y ser Pleno o Honorario.
 }
 ```
 
@@ -87,7 +87,7 @@ enum LoanStatus {
 
 ### Componentes de Arquitectura Hexagonal
 
-- **Domain**: Entidad `EquipmentLoan`. Regla de negocio `validateMemberCategory(member)` que lanza excepción si `member.category === 'Cadet'`. Regla `validateDueDate(dueDate, loanDate)` que lanza excepción si `dueDate <= loanDate`.
+- **Domain**: Entidad `EquipmentLoan`. Regla de negocio `validateMemberCategory(member)` que lanza excepción si `member.category === 'Cadete'`. Regla `validateDueDate(dueDate, loanDate)` que lanza excepción si `dueDate <= loanDate`.
 - **Application**: Caso de uso `CreateEquipmentLoanUseCase`. Orquesta: buscar el socio, validar su categoría, validar la fecha, persistir el préstamo. Puerto de salida `IEquipmentLoanRepository` (método `create`). Puerto de salida `IMemberRepository` (método `findById`).
 - **Infrastructure**: `PrismaEquipmentLoanRepository` implementando `create`. Controlador `EquipmentLoanController` con la ruta `POST` que mapea excepciones de dominio a códigos HTTP.
 
@@ -95,7 +95,7 @@ enum LoanStatus {
 
 | Escenario                                      | Resultado Esperado                                                   | Código HTTP actual               |
 | ---------------------------------------------- | -------------------------------------------------------------------- | ------------------------- |
-| Socio con categoría `Cadet`                    | Mensaje: "Los socios Cadet no pueden solicitar equipamiento."        | 403 Forbidden             |
+| Socio con categoría `Cadete`                    | Mensaje: "Los socios Cadet no pueden solicitar equipamiento."        | 403 Forbidden             |
 | `memberId` no existe                           | Mensaje: "El socio no existe."                                       | 404 Not Found             |
 | `dueDate` anterior o igual a `loanDate`        | Mensaje: "La fecha de devolución debe ser posterior a la de préstamo." | 400 Bad Request         |
 | `itemName` vacío o ausente                     | Mensaje: "El nombre del ítem es requerido."                          | 400 Bad Request           |
