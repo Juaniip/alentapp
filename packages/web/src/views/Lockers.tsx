@@ -139,7 +139,6 @@ export function LockersView() {
                     required
                   />
                 </Field>
-                </Field>
                 <Field label="Ubicación" required>
                   <Input
                     placeholder="Ej. Planta Baja - Sector A"
