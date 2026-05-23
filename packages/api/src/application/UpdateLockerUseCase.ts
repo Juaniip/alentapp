@@ -14,6 +14,22 @@ export class UpdateLockerUseCase {
         const resultingStatus = data.status ?? locker.status;
         const resultingMemberId = data.member_id !== undefined ? data.member_id : locker.member_id;
 
+        // Validar número obligatorio y positivo si se está modificando
+        if (data.number !== undefined) {
+            if (data.number === null) {
+                throw new Error('El número de casillero es obligatorio');
+            }
+            if (!Number.isInteger(data.number) || data.number <= 0) {
+                throw new Error('El número de casillero debe ser un entero positivo');
+            }
+        }
+
+        // Validar estado permitido
+        const validStatuses = ['Available', 'Occupied', 'Maintenance'];
+        if (data.status && !validStatuses.includes(data.status)) {
+            throw new Error(`Estado inválido. Los estados permitidos son: Available, Occupied, Maintenance`);
+        }
+
         // Regla de negocio: no se puede asignar un socio si el status es Maintenance
         if (resultingStatus === 'Maintenance' && resultingMemberId !== null) {
             throw new Error(`Un casillero en mantenimiento no puede tener un socio asignado`);
@@ -30,12 +46,6 @@ export class UpdateLockerUseCase {
             if (exists) {
                 throw new Error(`Ya existe un casillero con el número ${data.number}`);
             }
-        }
-
-        // Validar estado permitido
-        const validStatuses = ['Available', 'Occupied', 'Maintenance'];
-        if (data.status && !validStatuses.includes(data.status)) {
-            throw new Error(`Estado inválido. Los estados permitidos son: Available, Occupied, Maintenance`);
         }
 
         // Validar que el socio no tenga ya un casillero asignado
