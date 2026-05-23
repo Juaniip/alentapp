@@ -130,6 +130,7 @@ export function LockersView() {
                 <Field label="Número" required>
                   <Input
                     type="number"
+                    min="1"
                     placeholder="Ej. 42"
                     value={formData.number === 0 ? "" : formData.number}
                     onChange={(e) =>
@@ -137,6 +138,7 @@ export function LockersView() {
                     }
                     required
                   />
+                </Field>
                 </Field>
                 <Field label="Ubicación" required>
                   <Input

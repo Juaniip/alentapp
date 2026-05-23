@@ -7,6 +7,14 @@ export class CreateLockerUseCase {
     ) {}
 
     async execute(data: CreateLockerRequest): Promise<LockerDTO> {
+        // Validar número obligatorio y positivo
+        if (data.number === null || data.number === undefined) {
+            throw new Error('El número de casillero es obligatorio');
+        }
+        if (!Number.isInteger(data.number) || data.number <= 0) {
+            throw new Error('El número de casillero debe ser un entero positivo');
+        }
+
         // Regla de negocio: el número de casillero debe ser único
         const exists = await this.lockerRepository.existsByNumber(data.number);
         if (exists) {
@@ -19,9 +27,7 @@ export class CreateLockerUseCase {
             throw new Error(`Estado inválido. Los estados permitidos son: Available, Maintenance`);
         }
 
-        // Persistencia — member_id nulo por defecto (el save lo garantiza)
         const nuevoLocker = await this.lockerRepository.save(data);
-
         return nuevoLocker;
     }
 }
