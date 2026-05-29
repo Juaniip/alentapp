@@ -35,8 +35,8 @@ export class UpdateLockerUseCase {
             throw new Error(`Un casillero en mantenimiento no puede tener un socio asignado`);
         }
 
-        // Regla de negocio: no puede estar Occupied sin socio asignado
-        if (resultingStatus === 'Occupied' && resultingMemberId === null) {
+        // Regla de negocio: si se intenta poner Occupied explícitamente sin socio, lanzar error
+        if (data.status === 'Occupied' && resultingMemberId === null) {
             throw new Error(`Un casillero no puede estar Occupied sin un socio asignado`);
         }
 
