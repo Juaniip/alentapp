@@ -127,7 +127,7 @@ export function buildApp() {
 
     // --- Sports ---
     const sportRepo = new PostgresSportRepository();
-    const sportValidator = new SportValidator(sportRepo);
+    const sportValidator = new SportValidator();
     const deleteSportValidator = new DeleteSportValidator(sportRepo);
     const createSportUseCase = new CreateSportUseCase(sportRepo);
     const updateSportUseCase = new UpdateSportUseCase(sportRepo, sportValidator);

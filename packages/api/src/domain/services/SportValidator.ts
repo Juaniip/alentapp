@@ -1,8 +1,6 @@
-import { SportRepository } from '../SportRepository.js';
 import { UpdateSportRequest } from '@alentapp/shared';
 
 export class SportValidator {
-    constructor(private readonly sportRepo: SportRepository) {}
 
     validateMaxCapacity(maxCapacity: number): void {
         if (!Number.isInteger(maxCapacity) || maxCapacity <= 0) {
