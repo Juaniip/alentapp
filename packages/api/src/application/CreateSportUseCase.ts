@@ -7,7 +7,7 @@ export class CreateSportUseCase {
     ) {}
 
     async execute(data: CreateSportRequest): Promise<SportDTO> {
-        if (!data.name || !data.description) {
+        if (!data.name?.trim() || !data.description?.trim()) {
             throw new Error('Faltan campos requeridos');
         }
 
