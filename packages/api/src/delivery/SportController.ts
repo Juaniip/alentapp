@@ -59,6 +59,7 @@ export class SportController {
                 error.message.includes('El nombre del deporte no puede modificarse')
                 || error.message.includes('El cupo máximo debe ser mayor a cero')
                 || error.message.includes('El precio adicional no puede ser negativo')
+                || error.message.includes('La descripción no puede quedar vacía')
             ) {
                 return reply.status(400).send({ error: error.message });
             }
