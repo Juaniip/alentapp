@@ -36,8 +36,8 @@ export class PostgresSportRepository implements SportRepository {
     }
 
     async findByName(name: string): Promise<SportDTO | null> {
-        const sport = await prisma.sport.findUnique({
-            where: { name },
+        const sport = await prisma.sport.findFirst({
+            where: { name: { equals: name, mode: 'insensitive' } },
         });
 
         return sport ? this.mapToDTO(sport) : null;
