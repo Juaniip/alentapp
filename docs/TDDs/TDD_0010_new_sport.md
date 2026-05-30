@@ -1,6 +1,6 @@
 ---
 id: 0010
-estado: Propuesto
+estado: Implementado
 autor: Sergio Adrián Maldonado
 fecha: 2026-05-01
 titulo: Registro de Nuevos Deportes
