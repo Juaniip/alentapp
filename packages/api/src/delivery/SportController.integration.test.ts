@@ -36,6 +36,11 @@ vi.mock('../infrastructure/PostgresSportRepository.js', () => {
                 return { ...sport, ...data };
             }
             async delete(_id: string) { return; }
+            // NOTA: hasActiveEnrollments está marcado como TODO en PostgresSportRepository.ts
+            // (siempre devuelve false). Este mock simula el comportamiento correcto esperado
+            // una vez que se implemente el modelo Enrollment. El test del 409 en DELETE
+            // valida la lógica de DeleteSportUseCase + DeleteSportValidator, pero NO
+            // refleja el comportamiento actual en producción.
             async hasActiveEnrollments(sportId: string) { return sportId === 'sport-uuid-2'; }
         },
     };
