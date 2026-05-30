@@ -60,6 +60,7 @@ export function SportsView() {
 
   const openCreateModal = () => {
     setEditingSportId(null);
+    setError(null);
     setFormData({
       name: '',
       description: '',
@@ -72,6 +73,7 @@ export function SportsView() {
 
   const openEditModal = (sport: SportDTO) => {
     setEditingSportId(sport.id);
+    setError(null);
     setFormData({
       name: sport.name,
       description: sport.description,
@@ -99,7 +101,7 @@ export function SportsView() {
       setIsDialogOpen(false);
       fetchSports();
     } catch (err: any) {
-      alert(err.message || 'Error al guardar el deporte');
+      setError(err.message || 'Error al guardar el deporte');
     } finally {
       setIsSubmitting(false);
     }
@@ -114,7 +116,7 @@ export function SportsView() {
       await sportsService.delete(id);
       fetchSports();
     } catch (err: any) {
-      alert(err.message || 'Error al eliminar el deporte');
+      setError(err.message || 'Error al eliminar el deporte');
     } finally {
       setIsDeleting(null);
     }
