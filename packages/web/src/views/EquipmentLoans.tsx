@@ -392,7 +392,7 @@ export function EquipmentLoansView() {
                   <Table.ColumnHeader py="4">Estado</Table.ColumnHeader>
                   <Table.ColumnHeader py="4">Fecha Préstamo</Table.ColumnHeader>
                   <Table.ColumnHeader py="4">Fecha Devolución</Table.ColumnHeader>
-                  <Table.ColumnHeader py="4">Socio ID</Table.ColumnHeader>
+                  <Table.ColumnHeader py="4">Socio</Table.ColumnHeader>
                   <Table.ColumnHeader py="4" textAlign="end">Acciones</Table.ColumnHeader>
                 </Table.Row>
               </Table.Header>
@@ -421,8 +421,8 @@ export function EquipmentLoansView() {
                     <Table.Cell color="fg.muted">
                       {new Date(loan.dueDate).toLocaleDateString('es-AR')}
                     </Table.Cell>
-                    <Table.Cell color="fg.muted" fontSize="xs">
-                      {loan.memberId}
+                    <Table.Cell color="fg.muted">
+                      {loan.memberName}
                     </Table.Cell>
                     <Table.Cell textAlign="end">
                       <HStack gap="2" justify="flex-end">
