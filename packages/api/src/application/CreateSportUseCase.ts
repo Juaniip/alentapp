@@ -15,6 +15,10 @@ export class CreateSportUseCase {
             throw new Error('El cupo máximo debe ser mayor a cero');
         }
 
+        if (data.additionalPrice < 0) {
+            throw new Error('El precio adicional no puede ser negativo');
+        }
+
         const existingSport = await this.sportRepository.findByName(data.name.trim());
         if (existingSport) {
             throw new Error('Ya existe un deporte con ese nombre');
