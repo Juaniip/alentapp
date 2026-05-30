@@ -51,9 +51,11 @@ export class SportController {
             const sport = await this.updateSportUseCase.execute(request.params.id, request.body);
             return reply.status(200).send({ data: sport });
         } catch (error: any) {
+            if (error.message.includes('El deporte no existe')) {
+                return reply.status(404).send({ error: error.message });
+            }
             if (
-                error.message.includes('El deporte no existe')
-                || error.message.includes('El nombre del deporte no puede modificarse')
+                error.message.includes('El nombre del deporte no puede modificarse')
                 || error.message.includes('El cupo máximo debe ser mayor a cero')
             ) {
                 return reply.status(400).send({ error: error.message });
@@ -71,7 +73,7 @@ export class SportController {
             return reply.status(204).send();
         } catch (error: any) {
             if (error.message.includes('El deporte no existe')) {
-                return reply.status(400).send({ error: error.message });
+                return reply.status(404).send({ error: error.message });
             }
             if (error.message.includes('No se puede eliminar un deporte con inscripciones activas')) {
                 return reply.status(409).send({ error: error.message });
