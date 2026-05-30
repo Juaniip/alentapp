@@ -20,6 +20,13 @@ export class UpdateSportUseCase {
             this.sportValidator.validateMaxCapacity(data.maxCapacity);
         }
 
-        return this.sportRepository.update(id, data);
+        if (data.additionalPrice !== undefined && data.additionalPrice < 0) {
+            throw new Error('El precio adicional no puede ser negativo');
+        }
+
+        return this.sportRepository.update(id, {
+            ...data,
+            ...(data.description !== undefined && { description: data.description.trim() }),
+        });
     }
 }
