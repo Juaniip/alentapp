@@ -124,6 +124,7 @@ export interface EquipmentLoanDTO {
   loanDate: string; // ISO 8601
   dueDate: string;  // ISO 8601
   memberId: string;
+  memberName: string;
 }
 
 export interface CreateEquipmentLoanRequest {
