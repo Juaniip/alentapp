@@ -22,6 +22,7 @@ type DBEquipmentLoan = {
     loanDate: Date;
     dueDate: Date;
     memberId: string;
+    member?: { name: string };
 };
 
 export class PrismaEquipmentLoanRepository implements IEquipmentLoanRepository {
@@ -32,6 +33,7 @@ export class PrismaEquipmentLoanRepository implements IEquipmentLoanRepository {
                 dueDate: new Date(data.dueDate),
                 memberId: data.memberId,
             },
+            include: { member: true },
         });
 
         return this.mapToDTO(loan);
@@ -40,6 +42,7 @@ export class PrismaEquipmentLoanRepository implements IEquipmentLoanRepository {
     async findById(id: string): Promise<EquipmentLoanDTO | null> {
         const loan = await prisma.equipmentLoan.findUnique({
             where: { id },
+            include: { member: true },
         });
 
         return loan ? this.mapToDTO(loan) : null;
@@ -48,6 +51,7 @@ export class PrismaEquipmentLoanRepository implements IEquipmentLoanRepository {
     async findAll(): Promise<EquipmentLoanDTO[]> {
         const loans = await prisma.equipmentLoan.findMany({
             orderBy: { loanDate: 'desc' },
+            include: { member: true },
         });
 
         return loans.map((loan) => this.mapToDTO(loan));
@@ -61,6 +65,7 @@ export class PrismaEquipmentLoanRepository implements IEquipmentLoanRepository {
                 ...(data.status !== undefined && { status: data.status }),
                 ...(data.dueDate !== undefined && { dueDate: new Date(data.dueDate) }),
             },
+            include: { member: true },
         });
 
         return this.mapToDTO(loan);
@@ -80,6 +85,7 @@ export class PrismaEquipmentLoanRepository implements IEquipmentLoanRepository {
             loanDate: loan.loanDate.toISOString(),
             dueDate: loan.dueDate.toISOString(),
             memberId: loan.memberId,
+            memberName: loan.member?.name ?? loan.memberId,
         };
     }
 }
