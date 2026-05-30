@@ -36,6 +36,7 @@ export class SportController {
             if (
                 error.message.includes('Faltan campos requeridos')
                 || error.message.includes('El cupo máximo debe ser mayor a cero')
+                || error.message.includes('El precio adicional no puede ser negativo')
             ) {
                 return reply.status(400).send({ error: error.message });
             }
@@ -55,6 +56,7 @@ export class SportController {
                 error.message.includes('El deporte no existe')
                 || error.message.includes('El nombre del deporte no puede modificarse')
                 || error.message.includes('El cupo máximo debe ser mayor a cero')
+                || error.message.includes('El precio adicional no puede ser negativo')
             ) {
                 return reply.status(400).send({ error: error.message });
             }
