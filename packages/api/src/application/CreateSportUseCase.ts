@@ -7,12 +7,16 @@ export class CreateSportUseCase {
     ) {}
 
     async execute(data: CreateSportRequest): Promise<SportDTO> {
-        if (!data.name || !data.description) {
+        if (!data.name?.trim() || !data.description?.trim()) {
             throw new Error('Faltan campos requeridos');
         }
 
         if (!Number.isInteger(data.maxCapacity) || data.maxCapacity <= 0) {
             throw new Error('El cupo máximo debe ser mayor a cero');
+        }
+
+        if (data.additionalPrice < 0) {
+            throw new Error('El precio adicional no puede ser negativo');
         }
 
         const existingSport = await this.sportRepository.findByName(data.name.trim());
