@@ -204,7 +204,7 @@ export function SportsView() {
                       step="0.01"
                       value={formData.additionalPrice}
                       onChange={(e) =>
-                        setFormData({ ...formData, additionalPrice: parseFloat(e.target.value) })
+                        setFormData({ ...formData, additionalPrice: parseFloat(e.target.value) || 0 })
                       }
                     />
                   </Field>
