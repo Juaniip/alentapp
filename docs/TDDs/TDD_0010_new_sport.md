@@ -1,6 +1,6 @@
 ---
 id: 0010
-estado: Propuesto
+estado: Implementado
 autor: Sergio Adrián Maldonado
 fecha: 2026-05-01
 titulo: Registro de Nuevos Deportes
@@ -21,10 +21,12 @@ Permitir que un administrativo dé de alta de forma digital los deportes que se 
 
 ### Criterios de Aceptación
 
-- El sistema debe validar que el `name` del deporte sea único en el catálogo.
+- El sistema debe validar que el `name` del deporte sea único en el catálogo. La comparación de unicidad no distingue entre mayúsculas y minúsculas.
+- El sistema debe rechazar `name` y `description` que estén vacíos o que contengan solo espacios en blanco.
 - El sistema debe validar que `maxCapacity` sea un número entero estrictamente mayor a cero.
+- El sistema debe validar que `additionalPrice` sea un número mayor o igual a cero.
 - El sistema debe permitir indicar si el deporte requiere certificado médico (`requiresMedicalCertificate`).
-- Al finalizar, el sistema debe mostrar un mensaje de éxito y limpiar el formulario.
+- Al finalizar con éxito, el sistema debe cerrar el formulario y refrescar la tabla con el nuevo deporte.
 - El deporte queda registrado con su `name` marcado como inmutable de allí en adelante (la modificación posterior de `name` está prohibida — ver TDD-0011).
 
 ## Diseño Técnico (RFC)
@@ -34,10 +36,10 @@ Permitir que un administrativo dé de alta de forma digital los deportes que se 
 Se definirá la entidad `Sport` con las siguientes propiedades y restricciones:
 
 - `id`: Identificador único universal (UUID).
-- `name`: Cadena de texto, único e indexado. Inmutable después de la creación.
-- `description`: Cadena de texto.
+- `name`: Cadena de texto, único e indexado. La unicidad se valida sin distinción de mayúsculas y minúsculas. Inmutable después de la creación.
+- `description`: Cadena de texto. Se aplica trim antes de persistir.
 - `maxCapacity`: Entero, validado en dominio para que sea > 0.
-- `additionalPrice`: Número decimal (precio adicional por la disciplina).
+- `additionalPrice`: Número decimal (precio adicional por la disciplina). Debe ser >= 0.
 - `requiresMedicalCertificate`: Booleano.
 
 ### Contrato de API (@alentapp/shared)
@@ -60,18 +62,19 @@ Definiremos los tipos en el paquete compartido para asegurar sincronización:
 ### Componentes de Arquitectura Hexagonal
 
 1. **Puerto**: `SportRepository` (Interface en el Dominio con métodos `create` y `findByName`).
-2. **Caso de Uso**: `CreateSportUseCase` (Lógica que verifica si el `name` ya existe y valida `maxCapacity > 0` antes de llamar al repositorio).
+2. **Caso de Uso**: `CreateSportUseCase` (Lógica que verifica si el `name` ya existe, valida `maxCapacity > 0` y `additionalPrice >= 0` antes de llamar al repositorio).
 3. **Adaptador de Salida**: `PostgresSportRepository` (Implementación real en BD usando Prisma).
 4. **Adaptador de Entrada**: `SportController` (Ruta HTTP).
 
 ## Casos de Borde y Errores
 
-| Escenario                       | Resultado Esperado                                          | Código HTTP actual        |
-| ------------------------------- | ----------------------------------------------------------- | ------------------------- |
-| Nombre ya registrado            | Mensaje: "Ya existe un deporte con ese nombre"              | 409 Conflict              |
-| `maxCapacity <= 0`              | Mensaje: "El cupo máximo debe ser mayor a cero"             | 400 Bad Request           |
-| Datos faltantes                 | Mensaje: "Faltan campos requeridos"                         | 400 Bad Request           |
-| Error de conexión a DB          | Mensaje: "Error interno, reintente más tarde"               | 500 Internal Server Error |
+| Escenario                       | Resultado Esperado                                          | Código HTTP                |
+| ------------------------------- | ----------------------------------------------------------- | -------------------------- |
+| Nombre ya registrado            | Mensaje: "Ya existe un deporte con ese nombre"              | 409 Conflict               |
+| `maxCapacity <= 0`              | Mensaje: "El cupo máximo debe ser mayor a cero"             | 400 Bad Request            |
+| `additionalPrice < 0`           | Mensaje: "El precio adicional no puede ser negativo"        | 400 Bad Request            |
+| Datos faltantes o vacíos        | Mensaje: "Faltan campos requeridos"                         | 400 Bad Request            |
+| Error de conexión a DB          | Mensaje: "Error interno, reintente más tarde"               | 500 Internal Server Error  |
 
 ## Plan de Implementación
 

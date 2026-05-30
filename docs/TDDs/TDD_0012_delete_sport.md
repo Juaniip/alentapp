@@ -21,7 +21,7 @@ Permitir a los administrativos dar de baja permanentemente un deporte del catál
 
 ### Criterios de Aceptación
 
-- El sistema debe pedir una confirmación explícita (advertencia visual) antes de proceder con el borrado.
+- El sistema debe pedir una confirmación explícita (advertencia visual mediante diálogo) antes de proceder con el borrado.
 - El sistema debe validar que el deporte exista antes de intentar borrarlo.
 - El sistema debe validar que el deporte no tenga inscripciones activas (`Enrollment.isActive = true`) asociadas. Si las tiene, debe rechazar la operación.
 - El sistema debe realizar un borrado físico de la base de datos (hard delete).
@@ -46,12 +46,12 @@ Al tratarse de una operación destructiva que solo requiere conocer el identific
 
 ## Casos de Borde y Errores
 
-| Escenario                                      | Resultado Esperado                                                  | Código HTTP actual        |
-| ---------------------------------------------- | ------------------------------------------------------------------- | ------------------------- |
-| Deporte inexistente                            | Mensaje: "El deporte no existe"                                     | 400 Bad Request           |
-| Deporte con inscripciones activas              | Mensaje: "No se puede eliminar un deporte con inscripciones activas"| 409 Conflict              |
-| Error de conexión a DB                         | Mensaje: error del motor de base de datos                           | 400 Bad Request           |
-| Eliminación exitosa                            | Respuesta vacía                                                     | 204 No Content            |
+| Escenario                                      | Resultado Esperado                                                   | Código HTTP                |
+| ---------------------------------------------- | -------------------------------------------------------------------- | -------------------------- |
+| Deporte inexistente                            | Mensaje: "El deporte no existe"                                      | 404 Not Found              |
+| Deporte con inscripciones activas              | Mensaje: "No se puede eliminar un deporte con inscripciones activas" | 409 Conflict               |
+| Error de conexión a DB                         | Mensaje: "Error interno, reintente más tarde"                        | 500 Internal Server Error  |
+| Eliminación exitosa                            | Respuesta vacía                                                      | 204 No Content             |
 
 ## Plan de Implementación
 
@@ -59,4 +59,4 @@ Al tratarse de una operación destructiva que solo requiere conocer el identific
 2. Crear la lógica de negocio en `DeleteSportUseCase` (verificación de existencia + chequeo de inscripciones activas).
 3. Crear el endpoint `DELETE /api/v1/deportes/:id` en el `SportController` y registrarlo en `app.ts`.
 4. Añadir el método `delete` al servicio Frontend (`sports.ts`).
-5. Enlazar el botón de eliminación en `SportsView.tsx` agregando la confirmación del navegador (`window.confirm`) antes de hacer la llamada.
+5. Enlazar el botón de eliminación en `SportsView.tsx` mostrando un diálogo de confirmación antes de ejecutar la llamada al backend.

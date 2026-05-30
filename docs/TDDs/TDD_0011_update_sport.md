@@ -22,15 +22,17 @@ Permitir a los administrativos modificar la información de un deporte existente
 ### Criterios de Aceptación
 
 - El sistema debe permitir actualizar uno, varios o todos los campos editables del deporte: `description`, `maxCapacity`, `additionalPrice`, `requiresMedicalCertificate`.
-- El sistema **no debe permitir modificar el `name`** del deporte. Si el cliente envía ese campo, debe responder con un error de validación.
+- El sistema no debe permitir modificar el `name` del deporte. Si el cliente envía ese campo, debe responder con un error de validación.
 - El sistema debe validar que `maxCapacity`, en caso de ser modificado, sea un entero estrictamente mayor a cero.
+- El sistema debe validar que `additionalPrice`, en caso de ser modificado, sea mayor o igual a cero.
+- El campo `description`, en caso de ser modificado, se normaliza con trim antes de persistir. Si tras el trim resulta en cadena vacía, el sistema debe rechazar la operación.
 - Si la edición es correcta, debe retornar los nuevos datos del deporte actualizados.
 
 ## Diseño Técnico (RFC)
 
 ### Contrato de API (@alentapp/shared)
 
-Se utilizará el paquete compartido para definir el cuerpo de la petición. Todos los campos son opcionales ya que se trata de una actualización parcial. El campo `name` **no se expone** en la interfaz para reforzar a nivel de tipos su inmutabilidad.
+Se utilizará el paquete compartido para definir el cuerpo de la petición. Todos los campos son opcionales ya que se trata de una actualización parcial. El campo `name` no se expone en la interfaz para reforzar a nivel de tipos su inmutabilidad.
 
 - Endpoint: `PUT /api/v1/deportes/:id`
 - Request Body (UpdateSportRequest):
@@ -47,19 +49,21 @@ Se utilizará el paquete compartido para definir el cuerpo de la petición. Todo
 ### Componentes de Arquitectura Hexagonal
 
 1. **Puerto**: `SportRepository` (Método `update(id, data)`).
-2. **Servicio de Dominio**: `SportValidator` (Encargado de centralizar la validación de `maxCapacity > 0` y la validación defensiva contra modificación de `name`).
+2. **Servicio de Dominio**: `SportValidator` (Centraliza la validación de `maxCapacity > 0` y la validación defensiva contra modificación de `name`).
 3. **Caso de Uso**: `UpdateSportUseCase` (Orquesta la validación, verifica existencia previa vía `findById` y llama al repositorio).
 4. **Adaptador de Salida**: `PostgresSportRepository` (Actualización usando el método `update` de Prisma).
 5. **Adaptador de Entrada**: `SportController` (Ruta HTTP que extrae el `id` de la URL y mapea excepciones a códigos HTTP).
 
 ## Casos de Borde y Errores
 
-| Escenario                              | Resultado Esperado                                         | Código HTTP actual        |
-| -------------------------------------- | ---------------------------------------------------------- | ------------------------- |
-| Deporte inexistente                    | Mensaje: "El deporte no existe"                            | 400 Bad Request           |
-| Intento de modificar `name`            | Mensaje: "El nombre del deporte no puede modificarse"      | 400 Bad Request           |
-| `maxCapacity <= 0`                     | Mensaje: "El cupo máximo debe ser mayor a cero"            | 400 Bad Request           |
-| Error de conexión a DB                 | Mensaje: "Error interno, reintente más tarde"              | 500 Internal Server Error |
+| Escenario                              | Resultado Esperado                                         | Código HTTP                |
+| -------------------------------------- | ---------------------------------------------------------- | -------------------------- |
+| Deporte inexistente                    | Mensaje: "El deporte no existe"                            | 404 Not Found              |
+| Intento de modificar `name`            | Mensaje: "El nombre del deporte no puede modificarse"      | 400 Bad Request            |
+| `maxCapacity <= 0`                     | Mensaje: "El cupo máximo debe ser mayor a cero"            | 400 Bad Request            |
+| `additionalPrice < 0`                  | Mensaje: "El precio adicional no puede ser negativo"       | 400 Bad Request            |
+| `description` vacía o de solo espacios | Mensaje: "La descripción no puede quedar vacía"            | 400 Bad Request            |
+| Error de conexión a DB                 | Mensaje: "Error interno, reintente más tarde"              | 500 Internal Server Error  |
 
 ## Plan de Implementación
 
