@@ -120,6 +120,7 @@ export function SportsView() {
       setConfirmDeleteId(null);
       fetchSports();
     } catch (err: any) {
+      setConfirmDeleteId(null);
       setError(err.message || 'Error al eliminar el deporte');
     } finally {
       setIsDeleting(null);
