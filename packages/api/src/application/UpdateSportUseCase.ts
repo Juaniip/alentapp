@@ -24,10 +24,6 @@ export class UpdateSportUseCase {
             throw new Error('El precio adicional no puede ser negativo');
         }
 
-        if (data.description !== undefined && data.description.trim() === '') {
-            throw new Error('La descripción no puede quedar vacía');
-        }
-
         return this.sportRepository.update(id, {
             ...data,
             ...(data.description !== undefined && { description: data.description.trim() }),
