@@ -57,4 +57,17 @@ describe('DeleteEquipmentLoanUseCase', () => {
 
         expect(mockLoanRepo.delete).not.toHaveBeenCalled();
     });
+
+    it('debe lanzar InvalidLoanStatusError si el préstamo está en estado Damaged', async () => {
+        vi.mocked(mockLoanRepo.findById!).mockResolvedValueOnce({
+            ...loanLoaned,
+            status: 'Damaged',
+        });
+
+        await expect(useCase.execute('loan-1'))
+            .rejects.toBeInstanceOf(InvalidLoanStatusError);
+
+        expect(mockLoanRepo.delete).not.toHaveBeenCalled();
+    });
+
 });
