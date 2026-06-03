@@ -6,7 +6,8 @@
     "scripts": {
         "dev": "tsx watch src/app.ts",
         "test": "vitest",
-        "coverage": "vitest run --coverage"
+        "coverage": "vitest run --coverage",
+        "build": "tsc -p tsconfig.json"
     },
     "dependencies": {
         "@fastify/cors": "^11.2.0",
@@ -15,12 +16,14 @@
         "fastify": "^5.8.5"
     },
     "devDependencies": {
+        "@types/jest": "^30.0.0",
         "@types/pg": "^8.20.0",
         "@vitest/coverage-v8": "^4.1.5",
         "dotenv": "^16.6.1",
         "pg": "^8.20.0",
         "prisma": "^7.7.0",
         "tsx": "^4.21.0",
+        "typescript": "^6.0.3",
         "vitest": "^4.1.5"
     }
 }

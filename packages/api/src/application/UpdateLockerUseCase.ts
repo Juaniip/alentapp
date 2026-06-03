@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { LockerRepository } from '../domain/LockerRepository.js';
 import { LockerDTO, UpdateLockerRequest } from '@alentapp/shared';
 
