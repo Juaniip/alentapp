@@ -1,0 +1,122 @@
+services:
+    db:
+        image: postgres:16-alpine
+        container_name: alentapp-db
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+        networks:
+            - alentapp-network
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        logging:
+            driver: json-file
+            options:
+                max-size: '10m'
+                max-file: '3'
+        deploy:
+            resources:
+                limits:
+                    cpus: '0.5'
+                    memory: 512M
+                reservations:
+                    cpus: '0.25'
+                    memory: 128M
+
+    api:
+        build:
+            context: .
+            dockerfile: packages/api/Dockerfile.prod
+        container_name: alentapp-api
+        environment:
+            - DATABASE_URL=${DATABASE_URL}
+            - NODE_ENV=production
+        ports:
+            - '3000:3000'
+            - '9464:9464'
+        networks:
+            - alentapp-network
+        depends_on:
+            db:
+                condition: service_healthy
+        read_only: true
+        tmpfs:
+            - /tmp
+        cap_drop:
+            - ALL
+        security_opt:
+            - no-new-privileges:true
+        healthcheck:
+            test: ['CMD', 'wget', '-qO-', 'http://localhost:3000/']
+            interval: 30s
+            timeout: 5s
+            start_period: 15s
+            retries: 3
+        logging:
+            driver: json-file
+            options:
+                max-size: '10m'
+                max-file: '3'
+        deploy:
+            resources:
+                limits:
+                    cpus: '0.5'
+                    memory: 256M
+                reservations:
+                    cpus: '0.25'
+                    memory: 128M
+
+    web:
+        build:
+            context: .
+            dockerfile: packages/web/Dockerfile.prod
+        container_name: alentapp-web
+        ports:
+            - '80:80'
+        networks:
+            - alentapp-network
+        depends_on:
+            - api
+        read_only: true
+        tmpfs:
+            - /tmp
+            - /var/cache/nginx
+            - /var/run
+        cap_drop:
+            - ALL
+        cap_add:
+            - NET_BIND_SERVICE
+        security_opt:
+            - no-new-privileges:true
+        healthcheck:
+            test: ['CMD', 'wget', '-qO-', 'http://localhost:80']
+            interval: 30s
+            timeout: 5s
+            start_period: 5s
+            retries: 3
+        logging:
+            driver: json-file
+            options:
+                max-size: '10m'
+                max-file: '3'
+        deploy:
+            resources:
+                limits:
+                    cpus: '0.25'
+                    memory: 64M
+                reservations:
+                    cpus: '0.1'
+                    memory: 32M
+
+networks:
+    alentapp-network:
+        driver: bridge
+
+volumes:
+    pgdata:
