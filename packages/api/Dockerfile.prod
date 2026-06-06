@@ -56,14 +56,8 @@ WORKDIR /app
 # agrega ~20s de build time y genera una capa extra con metadatos duplicados.
 # --chown aplica el ownership en la misma instrucción COPY sin costo adicional.
 
-# node_modules raíz (dependencias hoisted por npm workspaces)
+# node_modules raíz: npm workspaces hoisteó todas las dependencias aquí
 COPY --chown=node:node --from=deps /app/node_modules ./node_modules
-
-# node_modules de cada workspace (dependencias NO hoisted, específicas del paquete)
-# Sin estos, cualquier dependencia que npm haya dejado en el workspace en lugar
-# de hoistearla al raíz causa un "Cannot find module" en runtime.
-COPY --chown=node:node --from=deps /app/packages/api/node_modules ./packages/api/node_modules
-COPY --chown=node:node --from=deps /app/packages/shared/node_modules ./packages/shared/node_modules
 
 # JavaScript compilado de la API y shared
 COPY --chown=node:node --from=build /app/packages/api/dist ./packages/api/dist
