@@ -1,11 +1,7 @@
-# =============================================================================
+# ==========================================
 # Stage 1: deps
-# Instala todas las dependencias necesarias para compilar el frontend.
-# Separado del stage build para aprovechar cache de capas Docker:
-# si el código cambia pero los package.json no, este stage no se re-ejecuta.
-# =============================================================================
+# ==========================================
 FROM node:22-alpine AS deps
-
 WORKDIR /app
 
 COPY package*.json ./
@@ -14,28 +10,22 @@ COPY packages/shared/package.json ./packages/shared/
 
 RUN npm ci
 
-
-# =============================================================================
+# ==========================================
 # Stage 2: build
-# Compila el frontend con Vite. Genera archivos estáticos en packages/web/dist/.
-# Node.js solo es necesario en este stage, no en la imagen final.
-# =============================================================================
+# ==========================================
 FROM node:22-alpine AS build
-
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-RUN npm run build -w packages/web
+# Nos metemos en la carpeta web SOLO para correr el build
+WORKDIR /app/packages/web
+RUN npx vite build
 
-
-# =============================================================================
-# Stage 3: runtime
-# Imagen final con nginx sirviendo los archivos estáticos.
-# NO contiene Node.js, npm ni ninguna herramienta de build.
-# Tamaño objetivo: ~50MB (vs ~570MB de la imagen de desarrollo).
-# =============================================================================
+# ==========================================
+# Stage 3: runtime (Solo Nginx, sin Node.js)
+# ==========================================
 FROM nginx:stable-alpine AS runtime
 
 COPY --from=build /app/packages/web/dist /usr/share/nginx/html
@@ -43,7 +33,7 @@ COPY packages/web/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
     CMD wget -qO- http://localhost:80 || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]
