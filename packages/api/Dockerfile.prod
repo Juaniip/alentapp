@@ -1,15 +1,10 @@
 # =============================================================================
 # Stage 1: deps
-# Instala únicamente las dependencias de producción.
-# Separado del stage de build para aprovechar el cache de capas:
-# si el código fuente cambia pero los package.json no, este stage no se re-ejecuta.
 # =============================================================================
 FROM node:22-alpine AS deps
 
 WORKDIR /app
 
-# Copiamos solo los manifiestos de los workspaces necesarios para la API.
-# NO incluimos packages/web para no invalidar el cache si el frontend cambia.
 COPY package*.json ./
 COPY packages/api/package.json ./packages/api/
 COPY packages/shared/package.json ./packages/shared/
@@ -19,8 +14,6 @@ RUN npm ci --omit=dev
 
 # =============================================================================
 # Stage 2: build
-# Instala todas las dependencias (incluyendo devDependencies) y compila
-# el TypeScript a JavaScript nativo con tsc.
 # =============================================================================
 FROM node:22-alpine AS build
 
@@ -34,48 +27,42 @@ RUN npm ci
 
 COPY . .
 
-# Generamos el cliente de Prisma (output: src/generated/client según schema.prisma)
 RUN npx prisma generate --config packages/api/prisma.config.ts
 
-# Compilamos TypeScript → JavaScript (requiere tsconfig.json con outDir: dist)
 RUN npm run build -w packages/api
 
 
 # =============================================================================
 # Stage 3: runtime
-# Imagen final mínima: solo el runtime de Node, el JS compilado,
-# las dependencias de producción y el cliente generado de Prisma.
-# NO contiene tsc, tsx, npm ni ninguna herramienta de build.
 # =============================================================================
 FROM node:22-alpine AS runtime
 
 WORKDIR /app
 
-# Usamos --chown en cada COPY en lugar de RUN chown -R al final.
-# Motivo: RUN chown sobre node_modules itera miles de archivos pequeños,
-# agrega ~20s de build time y genera una capa extra con metadatos duplicados.
-# --chown aplica el ownership en la misma instrucción COPY sin costo adicional.
-
-# node_modules raíz: npm workspaces hoisteó todas las dependencias aquí
+# Dependencias de producción
 COPY --chown=node:node --from=deps /app/node_modules ./node_modules
 
-# JavaScript compilado de la API y shared
+# JS compilado de la API
 COPY --chown=node:node --from=build /app/packages/api/dist ./packages/api/dist
+
+# Shared
 COPY --chown=node:node --from=build /app/packages/shared ./packages/shared
 
-# Cliente de Prisma generado (output definido en schema.prisma: src/generated/client)
-# No está en node_modules, por eso se copia explícitamente
+# Cliente de Prisma en src/generated (por si algún path lo busca ahí)
 COPY --chown=node:node --from=build /app/packages/api/src/generated ./packages/api/src/generated
 
-# Ejecutamos como usuario no-root (node, UID 1000, incluido en node:alpine)
+# Cliente de Prisma en dist/generated (donde lo busca el código compilado)
+COPY --chown=node:node --from=build /app/packages/api/src/generated ./packages/api/dist/generated
+
+# package.json necesario para que node resuelva el workspace
+COPY --chown=node:node --from=build /app/packages/api/package.json ./packages/api/package.json
+
 USER node
 
 EXPOSE 3000
+EXPOSE 9464
 
-# Verificación de que el proceso responde
-# Usamos la ruta / que ya existe en app.ts y no requiere conexión a DB
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
     CMD wget -qO- http://localhost:3000/ || exit 1
 
-# Ejecutamos el JS compilado directamente con node (sin tsx ni ts-node)
 CMD ["node", "packages/api/dist/app.js"]
