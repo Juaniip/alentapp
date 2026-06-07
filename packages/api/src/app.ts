@@ -1,3 +1,4 @@
+import './infrastructure/telemetry.js';
 import 'dotenv/config';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
@@ -41,6 +42,7 @@ import { UpdateEquipmentLoanUseCase } from './application/UpdateEquipmentLoanUse
 import { DeleteEquipmentLoanUseCase } from './application/DeleteEquipmentLoanUseCase.js';
 import { EquipmentLoanController } from './delivery/EquipmentLoanController.js';
 import { GetEquipmentLoansUseCase } from './application/GetEquipmentLoansUseCase.js';
+import { redMetrics } from './infrastructure/telemetry.js';
 
 
 export function buildApp() {
@@ -61,6 +63,30 @@ export function buildApp() {
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
+    });
+
+    // Hooks globales RED: instrumentan todas las rutas sin tocar cada controller
+    server.addHook('onRequest', (request, _reply, done) => {
+        (request as any).startTime = Date.now();
+        const route = (request as any).routerPath ?? request.url.split('?')[0];
+        redMetrics.activeRequests.add(1, { method: request.method, route });
+        done();
+    });
+
+    server.addHook('onResponse', (request, reply, done) => {
+        const route = (request as any).routerPath ?? request.url.split('?')[0];
+        const method = request.method;
+        const status = String(reply.statusCode);
+        const duration = Date.now() - ((request as any).startTime ?? Date.now());
+
+        redMetrics.requestCounter.add(1, { method, route, status });
+        redMetrics.requestDuration.record(duration, { method, route });
+        redMetrics.activeRequests.add(-1, { method: request.method, route });
+
+        if (reply.statusCode >= 400) {
+            redMetrics.errorCounter.add(1, { method, route, status });
+        }
+        done();
     });
 
     //Dependencias de Member
@@ -166,7 +192,7 @@ export function buildApp() {
     return server;
 }
 
-if (process.argv[1] && process.argv[1].endsWith('app.ts')) {
+if (process.argv[1] && (process.argv[1].endsWith('app.ts') || process.argv[1].endsWith('app.js'))) {
     const server = buildApp();
     const port = parseInt(process.env.PORT || '3000', 10);
 
