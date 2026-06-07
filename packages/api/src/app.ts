@@ -135,10 +135,10 @@ export function buildApp() {
     const getSportsUseCase = new GetSportsUseCase(sportRepo);
     const sportController = new SportController(createSportUseCase, updateSportUseCase, deleteSportUseCase, getSportsUseCase);
 
-    server.get('/api/v1/deportes', sportController.getAll.bind(sportController));
-    server.post('/api/v1/deportes', sportController.create.bind(sportController));
-    server.put('/api/v1/deportes/:id', sportController.update.bind(sportController));
-    server.delete('/api/v1/deportes/:id', sportController.delete.bind(sportController));
+    server.get('/api/v1/sport', sportController.getAll.bind(sportController));
+    server.post('/api/v1/sport', sportController.create.bind(sportController));
+    server.put('/api/v1/sport/:id', sportController.update.bind(sportController));
+    server.delete('/api/v1/sport/:id', sportController.delete.bind(sportController));
     
     
     // --- EquipmentLoan ---
